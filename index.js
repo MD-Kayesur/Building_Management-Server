@@ -1,15 +1,22 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
+var jwt = require('jsonwebtoken');
+var cookieParser = require('cookie-parser')
 const port = process.env.PORT || 4000
 require('dotenv').config()
-app.use(cors())
+
+app.use(cors( ))
 app.use(express.json())
+// app.use(jwt())
+app.use(cookieParser())
 
 
 
 
-
+// const verifyTokern=(req,res,next)=>{
+// const token
+// }
 
 
 
@@ -29,7 +36,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
 
 
         const othersSaysCollection = client.db('BuildingMangement').collection('othersays')
@@ -37,6 +44,24 @@ async function run() {
         const buildingCollection = client.db('BuildingMangement').collection('building')
         const userCollection = client.db('BuildingMangement').collection('user')
         const AnnounmentsCollection = client.db('BuildingMangement').collection('announcements')
+
+
+// jwt token
+
+app.post('/jwt',async(req,res)=>{
+ const user = req.body
+ console.log(user);
+ const Token = jwt.sign( user,process.env.JWT_TOKEN,{expiresIn:'6h'})
+ res
+ .cookie('token',Token,{
+    httpOnly:true,
+    secure:false
+ })
+ .send({success:true})
+
+})
+
+
 
 
         // othersSaysCollection
@@ -82,7 +107,8 @@ async function run() {
 
         app.delete('/users/:id', async (req, res) => {
             const data = req.params.id
-            const result = await userCollection.deleteOne(data)
+            const quary = {_id : new ObjectId(data)}
+            const result = await userCollection.deleteOne(quary)
             res.send(result)
         })
 
@@ -110,8 +136,8 @@ async function run() {
 
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("admin").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
