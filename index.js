@@ -6,7 +6,10 @@ var cookieParser = require('cookie-parser')
 const port = process.env.PORT || 4000
 require('dotenv').config()
 
-app.use(cors( ))
+app.use(cors( {
+    origin:['http://localhost:5173'],
+    credentials:true
+}))
 app.use(express.json())
 // app.use(jwt())
 app.use(cookieParser())
@@ -52,8 +55,9 @@ app.post('/jwt',async(req,res)=>{
  const user = req.body
  console.log(user);
  const Token = jwt.sign( user,process.env.JWT_TOKEN,{expiresIn:'6h'})
- res
- .cookie('token',Token,{
+ console.log(Token);
+ res.
+ cookie('token',Token,{
     httpOnly:true,
     secure:false
  })
